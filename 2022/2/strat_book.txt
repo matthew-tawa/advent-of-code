@@ -1,0 +1,9 @@
+A X rock rock tie
+A Y rock paper win
+A Z rock scissors lose
+B X paper rock lose
+B Y paper paper tie
+B Z paper scissors win
+C X scissors rock win
+C Y scissors paper lose
+C Z scissors scissors tie

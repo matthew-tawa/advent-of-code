@@ -1,0 +1,26 @@
+A Y
+B X
+C Z
+
+
+	OPP	ME
+ROCK	A	X
+PAPER	B	Y
+SCISS	C	Z
+
+  binary	hex
+A 0100 0001	41
+B 0100 0010	42
+C 0100 0011	43
+X 0101 1000	58
+Y 0101 1001	59
+Z 0101 1010	5a
+
+a beats z	1 beats 3
+b beats x	2 beats 1
+c beats y	3 beats 2
+
+
+0 beats 2
+1 beats 0
+2 beats 1
