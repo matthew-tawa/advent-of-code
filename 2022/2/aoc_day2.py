@@ -4,32 +4,31 @@
 class Game:
     def __init__(self, _me: str, _opp: str) -> None:
         # for both me and opp:
-        # 0 -> rock
-        # 1 -> paper
-        # 2 -> scissors
-        self.me = ord(_me) - 88
-        self.opp = ord(_opp) - 65
+        # 1 -> rock
+        # 2 -> paper
+        # 3 -> scissors
+        self.me = ord(_me) - 87
+        self.opp = ord(_opp) - 64
 
     def getResult(self) -> int:
-        # win/loss/tie_modifier
-        # 0x1 -> loss
-        # 0x0  -> tie
-        # 0x2 with mask -> win
-        wlt_modifier = (self.opp - self.me) & 0x3
+        # win/loss/tie points can be found from parabolic equation
+        # generated from the three points:
+        # (result,points) -> (win, 6) (tie, 3) (loss, 0)
+        # where:
+        # 0 -> win
+        # 2 -> tie
+        # 1 -> loss
+        result = (self.me - self.opp + 2) % 3
+        wlt_points = 4.5*result**2-10.5*result+6
 
-        if ((wlt_modifier & 0x2) == 2):
-            wlt_modifier = 1
-        else:
-            wlt_modifier *= -1
-
-        return (1 + self.me) + (3 + 3*wlt_modifier)
+        return self.me + wlt_points
 
 
 
 
 def main():
-    f = open('strat_book.txt', 'r')
-    #f = open('input.txt', 'r')
+    #f = open('strat_book.txt', 'r')
+    f = open('input.txt', 'r')
     
     my_score = 0
 
