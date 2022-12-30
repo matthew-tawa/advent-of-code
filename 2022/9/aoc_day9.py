@@ -4,12 +4,12 @@ import numpy as np
 
 
 # class to hold a head/tail pair and track their moves
-class RopeSection:
-    def __init__(self, head_x: int, head_y: int, tail_x: int, tail_y: int) -> None:
+class Rope2Knots:
+    def __init__(self, head_x: int, head_y: int) -> None:
         self.hx = head_x
         self.hy = head_y
-        self.tx = tail_x
-        self.ty = tail_y
+        self.tx = head_x
+        self.ty = head_y
         self.__dx = 0   # +ve if H > T, -ve if H < T
         self.__dy = 0   # +ve if H > T, -ve if H < T
         
@@ -30,6 +30,19 @@ class RopeSection:
                 self.__move_x(dist, 1, verbose_level)
             case _:
                 pass # should never occur
+
+    # update the position of the head, and update tail accordingly
+    def update_head(self, head_new_x: int, head_new_y: int) -> None:
+        self.hx = head_new_x
+        self.hy = head_new_y
+
+        self.h_visits.add((self.hx, self.hy))
+
+        self.__dx = self.hx - self.tx
+        self.__dy = self.hy - self.ty
+
+        self.__step_tail()
+        pass
 
     # move the head in x
     def __move_x(self, dist: int, sign: int = 1, verbose_level: str = "quiet") -> None:
@@ -85,25 +98,65 @@ class RopeSection:
 
 
     def __print_board(self) -> None:
-        board = [[".",".",".",".",".","."],[".",".",".",".",".","."],[".",".",".",".",".","."],[".",".",".",".",".","."],[".",".",".",".",".","."],[".",".",".",".",".","."]]
-        board[5-self.ty][self.tx] = "T"
-        board[5-self.hy][self.hx] = "H"
+        board_side_len = 6
+        board = [["." for i in range(board_side_len)] for j in range(board_side_len)]
+
+        board[board_side_len-1-self.ty][self.tx] = "T"
+        board[board_side_len-1-self.hy][self.hx] = "H"
+
         print("\n")
-        print(np.swapaxes(np.matrix(board).transpose(),0,1))
-        
-        
+        print(*board, sep="\n")
         
 
 
+class Rope10Knots:
+    def __init__(self, head_x: int, head_y: int) -> None:
+        self.sections = [Rope2Knots(head_x,head_y) for _ in range(9)]
+
+        #self.h_visits: set = {(self.sections[0], self.sections[0])}
+        #self.t_visits: set = {(self.sections[8], self.sections[8])}
+
+        self.__print_start_x = head_x
+        self.__print_start_y = head_y
+
+    # enter a move for the head
+    def move(self, dir: str, dist: int, verbose_level: str = "quiet") -> None:
+        for step in range(0, dist):
+            self.sections[0].move(dir, 1, verbose_level)
+            for pos, section in enumerate(self.sections[1:]):
+                prev_rope_tail_x = self.sections[pos].tx
+                prev_rope_tail_y = self.sections[pos].ty
+                section.update_head(prev_rope_tail_x, prev_rope_tail_y)
+
+    def print_board(self) -> None:
+        board_side_len = 30
+        board = [["." for i in range(board_side_len)] for j in range(board_side_len)]
+
+        board[board_side_len-1-self.__print_start_y][self.__print_start_x] = "S"
+
+        for i, section in enumerate(reversed(self.sections[1:])):
+            board[board_side_len-1-section.ty][section.tx] = str(9-i)
+
+        board[board_side_len-1-self.sections[0].ty][self.sections[0].tx] = "1"
+        board[board_side_len-1-self.sections[0].hy][self.sections[0].hx] = "H"
+
+        print("\n")
+        print(*board, sep="\n")
+                
+
+        
+        
 
 
 
-def main():
+
+
+def main1():
     #f = open('9\\moves.txt', 'r')
     f = open('9\\input.txt', 'r')
 
     # starting the rope arbitrarily at head(0,0) tail(0,0)
-    rope = RopeSection(0,0,0,0)
+    rope = Rope2Knots(0,0)
 
     input = f.readline()
 
@@ -124,8 +177,39 @@ def main():
 
     f.close()
 
-    print("number of unique crossed squares: " + str(len(rope.t_visits)))
+    print("number of unique crossed squares for 2  knot rope: " + str(len(rope.t_visits)))
 
 
-main()
+def main2():
+    #f = open('9\\moves_10knot.txt', 'r')
+    f = open('9\\input.txt', 'r')
+
+    # starting the rope arbitrarily at head(0,0) tail(0,0)
+    rope = Rope10Knots(10,10)
+
+    input = f.readline()
+
+    pattern_text = "(?P<dir>.) (?P<dist>\d+)"
+    pattern = re.compile(pattern_text)
+    matches = pattern.match(input)
+
+    alive = True
+    while alive:
+        matches = pattern.match(input)
+        move_direction = matches.group("dir")
+        move_distance  = int(matches.group("dist"))
+
+        rope.move(move_direction, move_distance, "quiet")
+        #rope.print_board()
+
+        input = f.readline()
+        alive = input != ""
+
+    f.close()
+
+    print("number of unique crossed squares for 10 knot rope: " + str(len(rope.sections[-1].t_visits)))
+
+
+main1()
+main2()
 
