@@ -113,9 +113,6 @@ class Rope10Knots:
     def __init__(self, head_x: int, head_y: int) -> None:
         self.sections = [Rope2Knots(head_x,head_y) for _ in range(9)]
 
-        #self.h_visits: set = {(self.sections[0], self.sections[0])}
-        #self.t_visits: set = {(self.sections[8], self.sections[8])}
-
         self.__print_start_x = head_x
         self.__print_start_y = head_y
 
