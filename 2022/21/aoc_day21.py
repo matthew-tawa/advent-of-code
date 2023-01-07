@@ -37,7 +37,7 @@ def get_monkey_number(name: str):
                     pass
             
         else: # we have a monkey with a number
-            result = words[1]
+            result = int(words[1])
 
         known_numbers[name] = result
         return result
@@ -53,3 +53,6 @@ data = data_str.split('\n')
 known_numbers = {}
 
 print("root will yell: " + str(get_monkey_number("root")))
+print(get_monkey_number("lntp"))
+print(get_monkey_number("bjft"))
+print("humn should yell: " + str(0))
