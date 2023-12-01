@@ -8,11 +8,12 @@ def main1():
     # obtaining the proper relative path
     script_location = Path(__file__).absolute().parent
     file_name = 'calibrations.txt'
+    file_name = 'input.txt'
     myfile = script_location / file_name
 
     # read the file into a list, split by the newline characters
+    # note:  read_text() automatically closes file when done 
     f = myfile.read_text().split('\n')
-    #f = open('9\\input.txt', 'r')
     # *****************************
 
     calib_sum = 0
