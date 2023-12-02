@@ -38,7 +38,7 @@ def main1():
 
     calib_sum = 0
 
-    pattern_text = r"\d|one|two|three|four|five|six|seven|eight|nine"
+    pattern_text = r"(?=(\d|one|two|three|four|five|six|seven|eight|nine))"
     pattern = re.compile(pattern_text)
 
     for line in f:
