@@ -1,5 +1,4 @@
 from pathlib import Path
-import re
 
 
 
@@ -45,8 +44,7 @@ def tryGetID(sch, row, col, valid=False):
 
 
 
-
-
+# determines a PN to add and the offset that we dont need to recheck
 def process(sch, row, col):
     pn = 0
     offset = 0
@@ -68,7 +66,7 @@ def main1():
     # obtaining the proper relative path
     script_location = Path(__file__).absolute().parent
     file_name = 'schematic.txt'
-    # file_name = 'input.txt'
+    file_name = 'input.txt'
     myfile = script_location / file_name
 
     # read the file into a list, split by the newline characters
