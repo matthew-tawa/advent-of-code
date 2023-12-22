@@ -22,9 +22,9 @@ hands = myfile.read_text().split('\n')
 def compare(hand1, hand2):
     if hand1[0] == hand2[0]:
         # map based on UTF-8. from left to right is smallest to biggest:
-        # UTF-8: 23456789:;<=>
-        # hands: 23456789TJKQA
-        mymap = (str.maketrans("TJQKA", ":;<=>"))
+        # UTF-8: 123456789:;<=
+        # hands: J23456789TKQA
+        mymap = (str.maketrans("JTQKA", "1:;<="))
         return 1 if hand1[1].translate(mymap) > hand2[1].translate(mymap) else -1
     else:
         return 1 if hand1[0] > hand2[0] else -1
@@ -33,30 +33,40 @@ def compare(hand1, hand2):
 # hand  : hand as a string of 5 characters
 def getType(hand):
     card_set = set(hand)
+
+    num_jokers = hand.count('J')
+    card_set.discard('J')
+
     card_set_len = len(card_set)
 
-    if card_set_len == 1:
+    # using <= in case we get a hand with 5 jokers
+    if card_set_len <= 1:
         return 6 # five of a kind
-    elif card_set_len == 5:
+    if card_set_len == 5:
         return 0 # high card
+    elif card_set_len == 4 and num_jokers == 1:
+        return 1 # one pair
 
-    # only sets with 2,3, or 4 unique cards make it here
+    # only sets with 2,3, or 4 unique non-joker cards make it here
+    best_hand = 0 # high card
     pair_found = False
     for card in card_set:
         count = hand.count(card)
 
-        if count == 4:
-            return 5 # four of a kind
-        elif card_set_len == 2 and (count == 2 or count == 3):
-            return 4 # full house
-        elif card_set_len == 3 and count == 3:
-            return 3 # three of a kind
-        elif count == 2 and pair_found:
-            return 2 # two pair
-        elif count == 2:
+        if (count+num_jokers) == 4:
+            # can return right away since this is the best hand from here on out
+            return 5 # four of a kind 
+        elif card_set_len == 2 and ((count+num_jokers) == 2 or (count+num_jokers) == 3):
+            best_hand = max(best_hand, 4) # full house
+        elif card_set_len == 3 and (count+num_jokers) == 3:
+            best_hand = max(best_hand, 3) # three of a kind
+        elif (count+num_jokers) == 2 and pair_found:
+            best_hand = max(best_hand, 2) # two pair
+        elif (count+num_jokers) == 2:
             pair_found = True
+            best_hand = max(best_hand, 1) # one pair
 
-    return 1 # one pair
+    return best_hand
 
     
 
