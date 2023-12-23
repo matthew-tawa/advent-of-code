@@ -4,7 +4,7 @@ import re
 # ***** IMPORT INPUT FILE *****
 # obtaining the proper relative path
 script_location = Path(__file__).absolute().parent
-# file_name = 'document.txt'
+# file_name = 'document2.txt'
 file_name = 'input.txt'
 myfile = script_location / file_name
 
@@ -16,25 +16,45 @@ document = myfile.read_text().split('\n')
 instructions = document[0]
 maps = document[2:]
 
-mymap = {}
+desertmap = {}
+mylocations = []
 pattern_text = "(...) = \((...), (...)\)"
 pattern = re.compile(pattern_text)
 for map in maps:
     matches = pattern.match(map)
 
-    mymap[matches[1]] = {'L': matches[2], 'R': matches[3]}
+    desertmap[matches[1]] = {'L': matches[2], 'R': matches[3]}
     
-final_location = 'ZZZ'
-current_location = 'AAA'
-step_num = 0
-timeout = 100000
-while step_num < timeout:
-    step_num += 1
+    if matches[1][2] == 'A':
+        mylocations.append(matches[1])
+    
+denominators = []
+for i, location in enumerate(mylocations):
+    step_num = 0
+    done = False
+    while not done:
+        step_num += 1
 
-    current_location = mymap[current_location][instructions[(step_num-1)%len(instructions)]]
+        mylocations[i] = desertmap[location][instructions[(step_num-1)%len(instructions)]]
 
-    if current_location == final_location:
-        break
+        done = mylocations[i][2] == 'Z'
+        
+    denominators.append(step_num)
+
+# wanted to find the smallest common denominator, but am now realizing that THIS WONT WORK!
+# need to fina nother way........
+# find greatest common factor
+factors = []
+for i, denominator in enumerate(denominators):
+    factors[i] = set()
+    for j in range(1, denominator+1):
+        if  denominator % j == 0:
+            factors[i].add(j)
+
+gcf = 0
+gcf = [x for x in factors[i] for i in range(1, len(factors))]
+
+    
 
 
 print("total steps: " + str(step_num))
