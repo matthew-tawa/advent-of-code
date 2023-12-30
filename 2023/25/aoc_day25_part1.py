@@ -29,7 +29,7 @@ class Node:
         self.children = children
 
     def addChildren(self, children: set):
-        self.children.union(children)
+        self.children = self.children.union(children)
 
 class Tree:
     def __init__(self):
@@ -51,19 +51,50 @@ class Tree:
                     n = Node(child, {node.data})
                     self.graph[child] = n
 
-    # depth-first search
-    def dfs(self, from_node, to_node):
+    # using Dijkstra's Algorithm
+    def find_all_paths(self, start, end, path = []):
+        path = path + [start]
 
-        print(1)
+        if start == end:
+            return [path]
+        
+        if start not in self.graph:
+            return []
+        
+        paths = []
+        for node in self.graph[start].children:
+            if node not in path:
+                newpaths = self.find_all_paths(node, end, path)
+                for newpath in newpaths:
+                    paths.append(newpath)
+        
+        return paths
+    
+    # find shortest path
+    def min_path(self, start, end):
+        paths = self.find_all_paths(start, end)
 
+        mdist = 999999
+        mpath = []
+
+        for path in paths:
+            dist = len(path)
+
+            if dist < mdist:
+                mdist = dist
+                mpath = path
+        
+        return mpath
+
+    def dfs(self, visited: set, node: Node, stop_node: Node):
+        if node.data not in visited and node.data != stop_node.data:
+            visited.add(node.data)
+            for child in node.children:
+                self.dfs(visited, child, stop_node)
 
 pattern_text = r"([a-z]{3})"
 pattern = re.compile(pattern_text)
 
-# set1 = set()
-# set2 = set()
-# head1 = pattern.findall(components[0])[0]
-# set1.add(head1)
 
 # building the tree
 tree = Tree()
@@ -77,12 +108,22 @@ for component in components:
     
     tree.add(node)
     
-# traversing through the tree
+# NOTE this finds roots, but it seems there are non in my given input
+# # finding all nodes with only one connection
+# roots = [node for node in tree.graph if len(tree.graph[node].children) == 1]
 
+# finding all paths between any two nodes
+# all_paths = tree.find_all_paths('bcf', 'pbp')
+all_paths = tree.find_all_paths('jqt', 'bvb')
 
+# count occurences of each node among these paths
+# idea is to find peak usage of certain routes
+for node in tree.graph:
+    print(1)
 
+print("multiply group sizes: " + str(len(all_paths)))
+print(1)
 
-print("multiply group sizes: " + str(1))
 
 
 
